@@ -21,12 +21,16 @@ class CommandServer:
         self.server.listen()
         print(f"[LISTENING] Server is listening on {self.host}")
         
-        while True:
-            connection, address = self.server.accept()
-            thread = threading.Thread(target=self.handle_client, args=(connection, address))
-            thread.start()
-            print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
-
+        try:
+            while True:
+                connection, address = self.server.accept()
+                thread = threading.Thread(target=self.handle_client, args=(connection, address))
+                thread.start()
+                print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
+        except KeyboardInterrupt:
+            print("Shutting server down")
+        finally: 
+            self.server.close()
 
 if __name__ == "__main__":
     HOST = '0.0.0.0'
