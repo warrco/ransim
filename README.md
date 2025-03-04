@@ -40,7 +40,7 @@ To run the client:
 python client.py
 ```
 
-Note: Anti-Virus solutions will detect and block any attempts to run this software. Solutions must be disabled in the environment where the simulation will occur.
+Note: Anti-Virus solutions will detect and block any attempts to run this software. Solutions must be disabled in the environment where the client will run.
 
 ## Legal Notice
 By using this software, you agree that:

