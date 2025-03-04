@@ -1,3 +1,9 @@
+# MIT License
+# Copyright (c) 2025 Warren Coleman
+# 
+# This software is provided for educational and research purposes only.
+# Unauthorized use of this tool for malicious purposes is illegal.
+
 import socket
 import threading
 import json
