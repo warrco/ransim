@@ -1,5 +1,6 @@
 import socket
 import threading
+import json
 
 class CommandServer:
  
@@ -11,14 +12,27 @@ class CommandServer:
     def handle_client(self, connection, address):
         print(f"[NEW CONNECTION] {address} connected")
 
-        connected = True
-        while connected:
-            msg_length = connection.recv(1024)
+        with connection:
+            try:
+                data = connection.recv(1024)
+                if not data:
+                    return
+                
+                json_data = json.loads(data.decode())
+                if 'request' in json_data and json_data['request'] == 'key':
+                    print(f"Send key to: {address}")
+                    key = input("Provide the key:")
+                    response = json.dumps({'key': key})
+                    connection.sendall(response.encode())
+                else:
+                    print(f"Received: {json_data}")
+            except:
+                print("Invalid JSON received")
 
     def start(self):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind((self.host, self.port))
-        self.server.listen()
+        self.server.listen(5)
         print(f"[LISTENING] Server is listening on {self.host}")
         
         try:
@@ -26,7 +40,7 @@ class CommandServer:
                 connection, address = self.server.accept()
                 thread = threading.Thread(target=self.handle_client, args=(connection, address))
                 thread.start()
-                print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
+                print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
         except KeyboardInterrupt:
             print("Shutting server down")
         finally: 
@@ -38,4 +52,3 @@ if __name__ == "__main__":
 
     command_server = CommandServer(HOST, PORT)
     command_server.start()
-
